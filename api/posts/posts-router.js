@@ -110,6 +110,32 @@ router.post("/", async (req, res) => {
 //   - return HTTP status code `200` (OK).
 //   - return the newly updated _post_.
 
+router.put("/:id", async (req, res) => {
+  try {
+    const postBody = {
+      title: req.body.title,
+      contents: req.body.contents,
+    };
+
+    if (!postBody.title || !postBody.contents) {
+      res
+        .status(400)
+        .json({ message: "Please provide title and contents for the post" });
+    } else {
+      const updated = await data.update(req.params.id, postBody);
+      if (updated) {
+        res.status(200).json(updated);
+      } else {
+        res
+          .status(404)
+          .json({ message: "The post with the specified ID does not exist" });
+      }
+    }
+  } catch (error) {
+    res.status(500).json({ message: "The post info could not be modified" });
+  }
+});
+
 // #### 5 [DELETE] /api/posts/:id
 
 // - If the _post_ with the specified `id` is not found:
@@ -122,6 +148,21 @@ router.post("/", async (req, res) => {
 //   - respond with HTTP status code `500`.
 //   - return the following JSON: `{ message: "The post could not be removed" }`.
 
+router.delete("/:id", async (req, res) => {
+  try {
+    const deleted = await data.remove(req.params.id);
+    if (!req.params.id) {
+      res
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist" });
+    } else {
+      res.status(204).json(deleted);
+    }
+  } catch (error) {
+    res.status(500).json({ message: "The post could not be removed" });
+  }
+});
+
 // #### 6 [GET] /api/posts/:id/comments
 
 // - If the _post_ with the specified `id` is not found:
@@ -133,5 +174,7 @@ router.post("/", async (req, res) => {
 
 //   - respond with HTTP status code `500`.
 //   - return the following JSON: `{ message: "The comments information could not be retrieved" }`.
+
+router.get("/:id/comments", async (req, res) => {});
 
 module.exports = router;
