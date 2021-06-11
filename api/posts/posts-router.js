@@ -11,6 +11,17 @@ const router = express.Router();
 //   - respond with HTTP status code `500`.
 //   - return the following JSON: `{ message: "The posts information could not be retrieved" }`.
 
+router.get("/", async (req, res) => {
+  try {
+    const posts = await data.find();
+    res.status(200).json(posts);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "The posts information could not be retrieved" });
+  }
+});
+
 // #### 2 [GET] /api/posts/:id
 
 // - If the _post_ with the specified `id` is not found:
