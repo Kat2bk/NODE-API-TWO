@@ -33,6 +33,21 @@ router.get("/", async (req, res) => {
 //   - respond with HTTP status code `500`.
 //   - return the following JSON: `{ message: "The post information could not be retrieved" }`.
 
+router.get("/:id", async (req, res) => {
+  try {
+    const post = await data.findById(req.params.id);
+    if (!req.params.id) {
+      res
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist" });
+    } else {
+      res.status(200).json(post);
+    }
+  } catch (error) {
+    res.status(500).json({ message: "The post info could not be retrieved" });
+  }
+});
+
 // #### 3 [POST] /api/posts
 
 // - If the request body is missing the `title` or `contents` property:
@@ -49,6 +64,28 @@ router.get("/", async (req, res) => {
 // - If there's an error while saving the _post_:
 //   - respond with HTTP status code `500` (Server Error).
 //   - return the following JSON: `{ message: "There was an error while saving the post to the database" }`.
+
+router.post("/", async (req, res) => {
+  try {
+    const postBody = {
+      title: req.body.title,
+      contents: req.body.contents,
+    };
+
+    if (!postBody.title || !postBody.contents) {
+      res
+        .status(400)
+        .json({ message: "Please provide title and contents for the post" });
+    } else {
+      const newPost = await data.insert(postBody);
+      res.status(201).json(newPost);
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: "There was an error while saving the post to the database",
+    });
+  }
+});
 
 // #### 4 [PUT] /api/posts/:id
 
